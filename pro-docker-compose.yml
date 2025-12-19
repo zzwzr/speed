@@ -1,0 +1,76 @@
+services:
+
+#  speed_hyperf:
+#   image: crpi-lp6p2h0hg03aypr2.cn-beijing.personal.cr.aliyuncs.com/zzwaa/speed_hyperf:1.4
+#   ports:
+#     - 8001:8001
+#   depends_on:
+#     - mysql
+#     - redis
+#   volumes:
+#     - /data/logs/hyperf:/var/www/runtime/logs
+
+#  speed_golang:
+#      image: crpi-lp6p2h0hg03aypr2.cn-beijing.personal.cr.aliyuncs.com/zzwaa/speed_golang:1.0
+#      ports:
+#        - 8002:8002
+
+#  speed_swoole:
+#      image: crpi-lp6p2h0hg03aypr2.cn-beijing.personal.cr.aliyuncs.com/zzwaa/speed_swoole:1.0
+#      ports:
+#        - 8003:8003
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: yes
+      MYSQL_DATABASE: speeds
+      MYSQL_USER: speed
+      MYSQL_PASSWORD: zZ1853212
+    ports:
+      - 3306:3306
+    volumes:
+#      - /data/docker/my_custom.cnf:/etc/mysql/conf.d/my_custom.cnf
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql-data:/var/lib/mysql
+
+  redis:
+    image: redis:latest
+    volumes:
+      - redis-data:/data
+
+  gitea:
+    image: gitea/gitea:1.24.1
+    environment:
+      - GITEA__database__DB_TYPE=mysql
+      - GITEA__database__HOST=mysql
+      - GITEA__database__NAME=gitea
+      - GITEA__database__USER=speed
+      - GITEA__database__PASSWD=zZ1853212
+    restart: always
+    volumes:
+      - /data/gitea:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "3000:3000"
+
+  runner:
+    image: crpi-lp6p2h0hg03aypr2.cn-beijing.personal.cr.aliyuncs.com/zzwaa/act_runner:1.0
+    depends_on:
+      - gitea
+    restart: always
+    volumes:
+      - /data/gitea/runner:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - GITEA_INSTANCE_URL=http://gitea:3000
+      - GITEA_RUNNER_REGISTRATION_TOKEN=mI4V3ZwrPyWyDTzLBJj4Bk2gzyCiZwJMt1b75GFp
+      - GITEA_RUNNER_NAME=docker-runner
+      - GITEA_RUNNER_LABELS=runner-ci
+
+volumes:
+  mysql-data:
+  redis-data:
+networks:
+  default_net:

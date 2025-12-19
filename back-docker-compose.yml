@@ -1,0 +1,114 @@
+services:
+  nginx:
+    image: nginx:1.27.3-alpine-perl
+    ports:
+      - 8000:8000
+    volumes:
+      - ./nginx/speeds.conf:/etc/nginx/conf.d/speeds.conf
+
+  nacos:
+    image: nacos/nacos-server:v2.3.2
+    ports:
+      - 8848:8848
+    environment:
+      MODE: standalone
+      NACOS_AUTH_ENABLE: 'false'
+    volumes:
+      - ./nacos/logs:/home/nacos/logs
+      - ./nacos/data:/home/nacos/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8848/nacos"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:4.1-management
+    ports:
+      - "5672:5672"      # AMQP 端口
+      - "15672:15672"    # Web 管理界面
+    environment:
+      RABBITMQ_DEFAULT_USER: speed
+      RABBITMQ_DEFAULT_PASS: zZ13623311
+    volumes:
+      - ./rabbitmq:/var/lib/rabbitmq
+    restart: always
+
+  # speed_laravel:
+  #   image: speed_laravel
+  #   depends_on:
+  #     - mysql
+  #     - redis
+  #   volumes:
+  #     - ./laravel/:/opt/www
+
+  hyperf:
+    image: speed_hyperf
+    expose:
+      - "8001"
+    depends_on:
+      - mysql
+      - redis
+      - nacos
+    volumes:
+      - ./hyperf/:/opt/www
+
+  seckill:
+    image: speed_seckill
+    expose:
+      - "8002"
+    depends_on:
+      - nacos
+      - redis
+    volumes:
+      - ./seckill/:/opt/www
+
+  # upload:
+  #   image: crpi-lp6p2h0hg03aypr2.cn-beijing.personal.cr.aliyuncs.com/zzwaa/speed_golang:1.0
+  #   expose:
+  #     - "8003"
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: 123123
+      # MYSQL_RANDOM_ROOT_PASSWORD: yes
+      MYSQL_DATABASE: speeds
+      MYSQL_USER: speed
+      MYSQL_PASSWORD: zZ1853212
+    ports:
+      - 3306:3306
+    volumes:
+      # - /data/docker/my_custom.cnf:/etc/mysql/conf.d/my_custom.cnf
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql_data:/var/lib/mysql
+
+  redis:
+    image: redis:7.4-alpine
+    expose:
+      - "6379"
+    volumes:
+      - redis_data:/data
+
+  # gitea:
+  #   image: gitea/gitea:1.24.1
+  #   environment:
+  #     - GITEA__database__DB_TYPE=mysql
+  #     - GITEA__database__HOST=mysql
+  #     - GITEA__database__NAME=gitea
+  #     - GITEA__database__USER=speed
+  #     - GITEA__database__PASSWD=zZ1853212
+  #   restart: always
+  #   volumes:
+  #     - /data/gitea:/data
+  #     - /etc/timezone:/etc/timezone:ro
+  #     - /etc/localtime:/etc/localtime:ro
+  #   ports:
+  #     - "3000:3000"
+
+volumes:
+  mysql_data:
+  redis_data:
+networks:
+  default_net:
+    name: default_net

@@ -1,0 +1,7 @@
+.idea/
+.git/
+*.runtime/
+*.vendor/
+*.cache
+.vscode/
+/nacos/

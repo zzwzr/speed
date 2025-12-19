@@ -1,0 +1,76 @@
+services:
+
+  nginx:
+    image: nginx:1.27.3-alpine-perl
+    ports:
+      - 8000:8000
+    volumes:
+      - ./nginx/speeds.conf:/etc/nginx/conf.d/speeds.conf
+
+  # rabbitmq:
+    # image: rabbitmq:4.1-management
+    # ports:
+    #   - "5672:5672"      # AMQP 端口
+    #   - "15672:15672"    # Web 管理界面
+    # environment:
+    #   RABBITMQ_DEFAULT_USER: speed
+    #   RABBITMQ_DEFAULT_PASS: zZ13623311
+    # volumes:
+    #   - ./rabbitmq:/var/lib/rabbitmq
+    # restart: always
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      # MYSQL_ROOT_PASSWORD: 123123
+      MYSQL_RANDOM_ROOT_PASSWORD: yes
+      MYSQL_DATABASE: relaxation
+      MYSQL_USER: speed
+      MYSQL_PASSWORD: zZ1853212
+    ports:
+      - 3306:3306
+    volumes:
+      # - /data/docker/my_custom.cnf:/etc/mysql/conf.d/my_custom.cnf
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql_data:/var/lib/mysql
+
+  redis:
+    image: redis:7.4-alpine
+    expose:
+      - "6379"
+    volumes:
+      - redis_data:/data
+
+  relaxation:
+    image: speed_relaxation
+    expose:
+      - "8003"
+    depends_on:
+      - mysql
+      - redis
+    volumes:
+      - ./relaxation/:/opt/www
+
+  # gitea:
+  #   image: gitea/gitea:1.24.1
+  #   environment:
+  #     - GITEA__database__DB_TYPE=mysql
+  #     - GITEA__database__HOST=mysql
+  #     - GITEA__database__NAME=gitea
+  #     - GITEA__database__USER=speed
+  #     - GITEA__database__PASSWD=zZ1853212
+  #   restart: always
+  #   volumes:
+  #     - /data/gitea:/data
+  #     - /etc/timezone:/etc/timezone:ro
+  #     - /etc/localtime:/etc/localtime:ro
+  #   ports:
+  #     - "3000:3000"
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  default_net:
+    name: default_net

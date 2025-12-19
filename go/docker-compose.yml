@@ -1,0 +1,39 @@
+services:
+
+  # balancer:
+  #   image: balancer
+  #   ports:
+  #     - 8000:8000
+  #   depends_on:
+  #     - mysql
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: 123123
+      MYSQL_DATABASE: concurrency
+    ports:
+      - 3306:3306
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p123123"]
+      interval: 2s        # 每 5 秒检查一次
+      timeout: 3s         # 每次检查超时时间
+      retries: 10         # 连续 10 次失败才算 unhealthy
+      start_period: 5s    # 容器启动后等待 10 秒再开始检查
+
+  faker:
+    image: faker
+    ports:
+      - 8000:8000
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
+  redis_data:
+networks:
+  default_net:
+    name: default_net
