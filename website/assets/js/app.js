@@ -13,12 +13,11 @@ const onlineCountElement = document.getElementById('online-count');
 // 游戏相关元素
 const startGameBtn = document.getElementById('start-game-btn');
 const gameState = document.getElementById('game-state');
-const gameBoard = document.getElementById('game-board');
 
 const statusMap = {
-  1: "未开始",
-  2: "游戏中", 
-  3: "已结束"
+    1: "未开始",
+    2: "游戏中",
+    3: "已结束"
 };
 
 window.settings = {
@@ -38,7 +37,7 @@ function showGameOver(resultText) {
 }
 async function loadRoom() {
 
-    const res = await fetch(`${API_BASE_URL}/api/v1/room/first?browser_id=${browserId}`);
+    const res = await fetch(`${HTTP}${BASE_URL}/api/v1/room/first?browser_id=${browserId}`);
     const data = await res.json();
     if (data.code !== 0) throw new Error(data.message || '获取房间信息失败');
 
@@ -81,7 +80,7 @@ function checkIfGameCanStart() {
 }
 
 // 开始游戏功能
-startGameBtn.addEventListener('click', function() {
+startGameBtn.addEventListener('click', function () {
     if (!currentRoom || !currentRoom.players[1] || !currentRoom.players[2]) {
         showToast('需要两名玩家才能开始游戏', 'error');
         return;
@@ -110,7 +109,7 @@ function resetBoard() {
 
 async function loadRoomList() {
     try {
-        const res = await fetch(`${API_BASE_URL}/api/v1/room`);
+        const res = await fetch(`${HTTP}${BASE_URL}/api/v1/room`);
         const data = await res.json();
 
         if (data.code !== 0) {
@@ -159,7 +158,7 @@ async function loadRoomList() {
 
 async function createRoom(roomName) {
 
-    fetch(`${API_BASE_URL}/api/v1/room`, {
+    fetch(`${HTTP}${BASE_URL}/api/v1/room`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -169,34 +168,34 @@ async function createRoom(roomName) {
             browser_id: browserId
         }),
     })
-    .then(async (response) => {
-        const data = await response.json().catch(() => ({}));
-        if (!response.ok) {
-            const message = data.message || `请求失败 (${response.status})`;
-            showToast('创建房间失败: ' + message, 'error');
-            throw new Error(message);
-        }
+        .then(async (response) => {
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                const message = data.message || `请求失败 (${response.status})`;
+                showToast('创建房间失败: ' + message, 'error');
+                throw new Error(message);
+            }
 
-        // 正常逻辑
-        if (data.code === 0) {
-            const roomCode = data.data.number;
+            // 正常逻辑
+            if (data.code === 0) {
+                const roomCode = data.data.number;
 
-            loadRoomList();
-            loadRoom();
-        } else {
-            showToast('创建房间失败: ' + (data.message || '未知错误'), 'error');
-        }
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-        showToast('创建房间失败，请检查网络连接', 'error');
-    });
+                loadRoomList();
+                loadRoom();
+            } else {
+                showToast('创建房间失败: ' + (data.message || '未知错误'), 'error');
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            showToast('创建房间失败，请检查网络连接', 'error');
+        });
 }
 
 // 加入房间
 async function joinSelectedRoom(roomNumber, roomName) {
     try {
-        const res = await fetch(`${API_BASE_URL}/api/v1/room/join`, {
+        const res = await fetch(`${HTTP}${BASE_URL}/api/v1/room/join`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -224,7 +223,7 @@ async function joinSelectedRoom(roomNumber, roomName) {
 }
 
 async function loadLink() {
-    const res = await fetch(`${API_BASE_URL}/api/v1/online/count`);
+    const res = await fetch(`${HTTP}${BASE_URL}/api/v1/online/count`);
     const data = await res.json();
 
     const el = onlineCountElement;

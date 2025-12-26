@@ -1,7 +1,7 @@
 // 获取浏览器ID函数
 function getBrowserId() {
     let browserId = localStorage.getItem('browser_id');
-    
+
     if (!browserId) {
         browserId = 'browser_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
         localStorage.setItem('browser_id', browserId);

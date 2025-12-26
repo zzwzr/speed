@@ -1,8 +1,6 @@
-const API_BASE_URL = '';
-
 async function startGame(roomId) {
     try {
-        const res = await fetch(`${API_BASE_URL}/api/v1/game/start`, {
+        const res = await fetch(`${HTTP}${BASE_URL}/api/v1/game/start`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -28,7 +26,7 @@ async function startGame(roomId) {
 async function restartGame(roomId) {
     console.log(roomId);
     try {
-        const res = await fetch(`${API_BASE_URL}/api/v1/game/restart`, {
+        const res = await fetch(`${HTTP}${BASE_URL}/api/v1/game/restart`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -42,6 +40,7 @@ async function restartGame(roomId) {
             showToast('开始游戏失败：' + (data.message || '未知错误'), 'error');
             return;
         }
+        loadRoom();
 
     } catch (err) {
         console.error(err);
@@ -50,7 +49,7 @@ async function restartGame(roomId) {
 }
 
 // async function sendMoveRequest(payload) {
-//     const res = await fetch(`${API_BASE_URL}/api/v1/game/move`, {
+//     const res = await fetch(`${HTTP}${BASE_URL}/api/v1/game/move`, {
 //         method: 'POST',
 //         headers: { 'Content-Type': 'application/json' },
 //         body: JSON.stringify(payload)

@@ -1,7 +1,7 @@
 let ws = null;
 
 function connectWebSocket(browserId) {
-    ws = new WebSocket(`ws://${location.hostname}:8000/ws?browser_id=${browserId}`);
+    ws = new WebSocket(`ws://${WS_URL}/ws?browser_id=${browserId}`);
 
     ws.onopen = () => {
         startHeartbeat(ws);
@@ -13,6 +13,14 @@ function connectWebSocket(browserId) {
             const res = JSON.parse(event.data);
             if (res.type === 'PONG') {
                 return;
+            }
+
+            if (res.type === 'ERROR') {
+                showToast(res.message, 'error');
+            }
+
+            if (res.type === 'LOAD') {
+                loadRoom();
             }
 
             if (res.type !== 'PONG') {
@@ -44,15 +52,14 @@ function connectWebSocket(browserId) {
     };
 
     ws.onerror = (err) => console.error('ws 错误:', err);
-    ws.onclose = () => console.log('ws 已关闭'); 
+    ws.onclose = () => console.log('ws 已关闭');
 }
 
 let heartbeatTimer = null;
 
 function startHeartbeat() {
     heartbeatTimer = setInterval(() => {
-        console.log('PING');
-        wsSend({type: 'PING'});
+        wsSend({ type: 'PING' });
     }, 10000);
 }
 

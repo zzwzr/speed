@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,9 @@
 
     <link rel="stylesheet" href="./assets/css/style.css">
     <link rel="stylesheet" href="./assets/css/popup.css">
+    <link rel="stylesheet" href="./assets/css/chess.css">
 </head>
+
 <body>
     <!-- 顶部导航栏 - 绝对定位 -->
     <div class="top-nav">
@@ -15,7 +18,7 @@
             <h1>Fishdept</h1>
             <p class="description">摸鱼大事儿</p>
         </div>
-        
+
         <div class="user-section">
             <div class="user-info">
                 <div class="user-name" id="user-name">游客</div>
@@ -33,9 +36,9 @@
             <div class="tab-title">玩法</div>
             <div class="tab-item active" data-tab="tic-tac-toe">井字棋</div>
             <div class="tab-item" data-tab="chess">象棋</div>
-            <div class="tab-item" data-tab="go">围棋</div>
-            <div class="tab-item" data-tab="battleship">海战棋</div>
-            
+            <!-- <div class="tab-item" data-tab="go">围棋</div>
+            <div class="tab-item" data-tab="battleship">海战棋</div> -->
+
             <!-- 房间列表 -->
             <div class="room-list">
                 <div class="room-list-title">房间列表</div>
@@ -68,8 +71,8 @@
 
             <div class="game-content">
                 <div class="game-header">
-                    <div class="game-title" id="game-title">井字棋</div>
-                    
+                    <div class="" id="game-title">井字棋</div>
+
                     <!-- 玩家信息展示 -->
                     <div class="players-display">
                         <div class="player-card" id="player1-card">
@@ -89,9 +92,9 @@
                         <button class="control-btn start-game-btn" id="start-game-btn" disabled>开始游戏</button>
                     </div>
                 </div>
-                
+
                 <div class="game-area">
-                    <div class="game-board" id="game-board">
+                    <div class="tictactoe-board" id="tictactoe-board">
                         <div class="cell" data-index="0"></div>
                         <div class="cell" data-index="1"></div>
                         <div class="cell" data-index="2"></div>
@@ -102,11 +105,15 @@
                         <div class="cell" data-index="7"></div>
                         <div class="cell" data-index="8"></div>
                     </div>
+                    <div class="chess-board" id="chess-board" style="display: none;">
+                        
+                    </div>
                 </div>
             </div>
         </div>
+
     </div>
-    
+
     <!-- 登录弹窗 -->
     <div id="login-modal" class="modal">
         <div class="modal-content">
@@ -131,7 +138,7 @@
                     还没有账号？<a id="switch-to-register">立即注册</a>
                 </div>
             </form>
-            
+
             <form id="register-form" style="display: none;">
                 <div class="form-group">
                     <label for="reg-username">用户名</label>
@@ -190,15 +197,17 @@
             </div>
         </div>
     </div>
+    <script src="./assets/js/host.js"></script>
     <script src="./assets/js/utils.js"></script>
     <script src="./assets/js/websocket.js"></script>
     <script src="./assets/js/api.js"></script>
     <script src="./assets/js/app.js"></script>
     <script src="./assets/js/game/tictactoe.js"></script>
+    <script src="./assets/js/game/chess.js"></script>
     <script>
         const browserId = getBrowserId();
 
-        document.addEventListener('DOMContentLoaded', async function() {
+        document.addEventListener('DOMContentLoaded', async function () {
 
             // 房间状态变量
             let currentRoom = null;
@@ -235,20 +244,17 @@
             // browserIdElement.textContent = getBrowserId();
 
             // 创建房间功能
-            newGameBtn.addEventListener('click', function() {
+            newGameBtn.addEventListener('click', function () {
                 createRoomModal.style.display = 'flex';
             });
 
             function closeCreateRoomModal() {
                 createRoomModal.style.display = 'none';
             }
-            
-
-
             closeCreateRoomModalBtn.addEventListener('click', closeCreateRoomModal);
             cancelCreateRoom.addEventListener('click', closeCreateRoomModal);
 
-            createRoomForm.addEventListener('submit', function(e) {
+            createRoomForm.addEventListener('submit', function (e) {
                 e.preventDefault();
                 const roomName = roomNameInput.value;
 
@@ -263,35 +269,35 @@
 
             closeGameOverModalBtn.addEventListener('click', closeGameOverModal);
 
-
             // 重新开始游戏
-            restartGameBtn.addEventListener('click', function() {
+            restartGameBtn.addEventListener('click', function () {
                 resetGame();
                 closeGameOverModal();
                 restartGame(roomIdElement.textContent);
             });
 
             // 退出房间
-            exitRoomBtn.addEventListener('click', function() {
-                currentRoom = null;
-                currentPlayerRole = null;
-                resetGame();
-                closeGameOverModal();
+            exitRoomBtn.addEventListener('click', function () {
+                showToast('没这功能！', 'error');
+                // currentRoom = null;
+                // currentPlayerRole = null;
+                // resetGame();
+                // closeGameOverModal();
 
-                // 重置玩家显示
-                player1Name.textContent = '玩家1';
-                player2Name.textContent = '玩家2';
-                player1Status.textContent = '等待加入';
-                player2Status.textContent = '等待加入';
-                player1Card.classList.remove('occupied');
-                player2Card.classList.remove('occupied');
-                gameState.textContent = '等待开始';
-                startGameBtn.disabled = true;
+                // // 重置玩家显示
+                // player1Name.textContent = '玩家1';
+                // player2Name.textContent = '玩家2';
+                // player1Status.textContent = '等待加入';
+                // player2Status.textContent = '等待加入';
+                // player1Card.classList.remove('occupied');
+                // player2Card.classList.remove('occupied');
+                // gameState.textContent = '等待开始';
+                // startGameBtn.disabled = true;
             });
 
             // 选项卡切换
             tabItems.forEach(tab => {
-                tab.addEventListener('click', function() {
+                tab.addEventListener('click', function () {
 
                     tabItems.forEach(item => item.classList.remove('active'));
 
@@ -301,7 +307,7 @@
                     const gameName = this.getAttribute('data-tab');
                     let displayName = '';
 
-                    switch(gameName) {
+                    switch (gameName) {
                         case 'tic-tac-toe':
                             displayName = '井字棋';
                             setupTicTacToe();
@@ -310,113 +316,11 @@
                             displayName = '象棋';
                             setupChess();
                             break;
-                        case 'go':
-                            displayName = '围棋';
-                            setupGo();
-                            break;
-                        case 'battleship':
-                            displayName = '海战棋';
-                            setupBattleship();
-                            break;
                     }
 
                     gameTitle.textContent = displayName;
                 });
-            });            
-
-            function setupChess() {
-                // 隐藏井字棋棋盘
-                gameBoard.style.display = 'none';
-
-                const placeholders = ['go-placeholder', 'checkers-placeholder', 'battleship-placeholder'];
-                placeholders.forEach(id => {
-                    const placeholder = document.getElementById(id);
-                    if (placeholder) {
-                        placeholder.style.display = 'none';
-                    }
-                });
-
-                // 创建或显示象棋界面
-                let chessPlaceholder = document.getElementById('chess-placeholder');
-                if (!chessPlaceholder) {
-                    chessPlaceholder = document.createElement('div');
-                    chessPlaceholder.id = 'chess-placeholder';
-                    chessPlaceholder.className = 'game-placeholder';
-                    chessPlaceholder.innerHTML = '<div style="padding: 50px; text-align: center;">象棋游戏界面<br><small>功能开发中</small></div>';
-                    gameBoard.parentNode.appendChild(chessPlaceholder);
-                } else {
-                    chessPlaceholder.style.display = 'block';
-                }
-                gameState.textContent = '未开始';
-            }
-
-            function setupGo() {
-                // 隐藏井字棋棋盘
-                gameBoard.style.display = 'none';
-                const placeholders = ['chess-placeholder', 'checkers-placeholder', 'battleship-placeholder'];
-                placeholders.forEach(id => {
-                    const placeholder = document.getElementById(id);
-                    if (placeholder) {
-                        placeholder.style.display = 'none';
-                    }
-                });
-
-                // 创建或显示围棋界面
-                let goPlaceholder = document.getElementById('go-placeholder');
-                if (!goPlaceholder) {
-                    goPlaceholder = document.createElement('div');
-                    goPlaceholder.id = 'go-placeholder';
-                    goPlaceholder.innerHTML = '<div style="padding: 50px; text-align: center;">围棋游戏界面<br><small>功能开发中</small></div>';
-                    gameBoard.parentNode.appendChild(goPlaceholder);
-                } else {
-                    goPlaceholder.style.display = 'block';
-                }
-
-                gameState.textContent = '未开始';
-            }
-
-            function setupBattleship() {
-                // 隐藏井字棋棋盘
-                gameBoard.style.display = 'none';
-                const placeholders = ['chess-placeholder', 'go-placeholder', 'checkers-placeholder'];
-                placeholders.forEach(id => {
-                    const placeholder = document.getElementById(id);
-                    if (placeholder) {
-                        placeholder.style.display = 'none';
-                    }
-                });
-
-                // 创建或显示海战棋界面
-                let battleshipPlaceholder = document.getElementById('battleship-placeholder');
-                if (!battleshipPlaceholder) {
-                    battleshipPlaceholder = document.createElement('div');
-                    battleshipPlaceholder.id = 'battleship-placeholder';
-                    battleshipPlaceholder.innerHTML = '<div style="padding: 50px; text-align: center;">海战棋游戏界面<br><small>功能开发中</small></div>';
-                    gameBoard.parentNode.appendChild(battleshipPlaceholder);
-                } else {
-                    battleshipPlaceholder.style.display = 'block';
-                }
-                gameState.textContent = '未开始';
-            }
-
-            // 在退出房间时也需要调用
-            exitRoomBtn.addEventListener('click', function() {
-                currentRoom = null;
-                currentPlayerRole = null;
-                resetGame();
-                closeGameOverModal();
-
-                // 重置玩家显示
-                player1Name.textContent = '玩家1';
-                player2Name.textContent = '玩家2';
-                player1Card.classList.remove('occupied');
-                player2Card.classList.remove('occupied');
-
-                gameState.textContent = '等待开始';
-                startGameBtn.disabled = true;
             });
-
-
             // 加载房间列表
             loadRoomList();
 
@@ -440,4 +344,5 @@
         // 问题2：在线人数刷新会闪烁一下
     </script>
 </body>
+
 </html>

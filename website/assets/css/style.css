@@ -265,13 +265,6 @@ body {
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.game-title {
-    font-size: 2rem;
-    color: #fdbb2d;
-    width: 200px; /* 固定宽度，防止位置变化 */
-    text-align: center;
-}
-
 .players-display {
     display: flex;
     justify-content: center;
@@ -365,7 +358,7 @@ body {
     padding: 20px;
 }
 
-.game-board {
+.tictactoe-board {
     width: 400px;
     height: 400px;
     background: rgba(255, 255, 255, 0.1);
@@ -644,7 +637,7 @@ body {
         margin: 0;
     }
     
-    .game-board {
+    .tictactoe-board {
         width: 300px;
         height: 300px;
     }
@@ -654,7 +647,7 @@ body {
         gap: 15px;
     }
     
-    .game-title, .players-display, .game-controls {
+    .players-display, .game-controls {
         width: 100%;
     }
 

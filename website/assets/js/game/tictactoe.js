@@ -1,4 +1,4 @@
-
+const tictactoeBoard = document.getElementById('tictactoe-board');
 // 游戏状态变量
 let currentPlayer = 'X';
 
@@ -10,14 +10,14 @@ let scores = {
 };
 
 function setupTicTacToe() {
-    const placeholders = ['chess-placeholder', 'go-placeholder', 'checkers-placeholder', 'battleship-placeholder'];
+    const placeholders = ['chess-board'];
     placeholders.forEach(id => {
         const placeholder = document.getElementById(id);
         if (placeholder) placeholder.style.display = 'none';
     });
 
-    // 显示棋盘
-    gameBoard.style.display = 'grid';
+    // 显示棋盘 
+    tictactoeBoard.style.display = 'grid';
 
     resetGame();
 
